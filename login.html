@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrador - Castingred</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding: 0;
+            background: linear-gradient(135deg, #fcb69f, #ffecd2);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white; padding: 40px; border-radius: 20px; width: 380px;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.20); text-align: center;
+        }
+        h2 { margin-bottom: 20px; color:#333; font-weight:700; }
+        input { width:100%; padding:12px; margin-bottom:15px; border-radius:12px; border:2px solid #ccc; font-size:1rem; }
+        input:focus { border-color:#ff7e5f; box-shadow:0 0 8px rgba(255,126,95,0.5); }
+        input.error { border-color:#ff3b3b; background:#ffe5e5; }
+        button { width:100%; padding:12px; border-radius:12px; border:none; background-color:#ff7e5f; color:white; font-size:1.1rem; cursor:pointer; transition:0.3s;}
+        button:hover { background-color:#ff5a36; }
+        #loader { display:none; margin-top:15px; }
+        .loader-circle { width:35px; height:35px; border:4px solid #ff7e5f; border-top-color:transparent; border-radius:50%; animation:girar 0.8s linear infinite; margin:0 auto;}
+        @keyframes girar { 0% { transform:rotate(0deg);} 100% { transform:rotate(360deg);} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Ingreso Administrador</h2>
+
+    <form id="formAdmin">
+        <input type="email" id="adminEmail" placeholder="Correo administrador" required>
+        <input type="password" id="adminPass" placeholder="Contraseña" required>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <div id="loader">
+        <div class="loader-circle"></div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBQmYwkqr29lvaF8ew3BJ2suc5UxRaVU1Y",
+    authDomain: "castingred-a6f6e.firebaseapp.com",
+    projectId: "castingred-a6f6e",
+    storageBucket: "castingred-a6f6e.appspot.com",
+    messagingSenderId: "61701399093",
+    appId: "1:61701399093:web:678b77ff06ce83e1a1077c",
+    measurementId: "G-J1QPG9HXGZ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const form = document.getElementById("formAdmin");
+const loader = document.getElementById("loader");
+
+form.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+
+    const email = document.getElementById("adminEmail");
+    const password = document.getElementById("adminPass");
+    email.classList.remove("error");
+    password.classList.remove("error");
+    loader.style.display = "block";
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+
+        // Solo el correo de administrador puede entrar
+        if(userCredential.user.email === "vm20936@gmail.com"){
+            window.location.href = "paneldeactores.html";
+        } else {
+            alert("No tienes permisos de administrador");
+            email.classList.add("error");
+        }
+    } catch(error){
+        alert("Error: "+error.message);
+        email.classList.add("error");
+        password.classList.add("error");
+    }
+
+    loader.style.display = "none";
+});
+</script>
+
+</body>
+</html>

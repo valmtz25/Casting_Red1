@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="shortcut icon" href="images/favicon.icon.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Actores - Castingred</title>
+    <style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  width: 400px;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  text-align: center;
+}
+.header-img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.titulo-principal {
+  font-size: 2.5rem;
+  color: #ff5a36;
+  margin-bottom: 20px;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+h2 {
+  margin-bottom: 25px;
+  color: #333;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background-color: #ff7e5f;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #ff5a36;
+}
+a {
+  display: block;
+  margin-top: 15px;
+  color: #ff5a36;
+  text-decoration: none;
+}
+.redes {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+.icono-redes {
+  width: 40px;
+  height: 40px;
+  transition: transform 0.2s;
+}
+.icono-redes:hover {
+  transform: scale(1.2);
+}
+@media (max-width: 500px) {
+  .titulo-principal { font-size: 2rem; }
+  .container { width: 90%; padding: 30px; }
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="images/foto_actor.jpg" alt="Encabezado" class="header-img">
+
+  <h1 class="titulo-principal">CASTINGRED</h1>
+  <h2>Regístrate como Actor</h2>
+
+  <form id="formActor">
+    <input type="file" id="fotoActor" accept="image/*" required>
+    <input type="text" id="nombreCompleto" placeholder="Nombre completo" required>
+    <input type="number" id="edad" placeholder="Edad" required>
+    <select id="genero" required>
+      <option value="">Seleccione género</option>
+      <option value="Femenino">Femenino</option>
+      <option value="Masculino">Masculino</option>
+      <option value="Otro">Otro</option>
+    </select>
+    <input type="text" id="telefono" placeholder="Teléfono" required>
+    <input type="email" id="correo" placeholder="Correo" required>
+    <textarea id="experiencia" placeholder="Describe tu experiencia"></textarea>
+    <input type="text" id="rolPreferido" placeholder="Rol preferido (opcional)">
+    <input type="url" id="portafolioDigital" placeholder="Enlace a tu portafolio digital (opcional)">
+    <button type="submit">Registrarme</button>
+  </form>
+
+  <a href="login.html">¿Eres administrador? Inicia sesión</a>
+
+  <div class="redes">
+    <a href="https://www.facebook.com/ckevinmoncada" target="_blank">
+      <img src="images/logofacebook.png" alt="Facebook" class="icono-redes">
+    </a>
+    <a href="https://www.instagram.com/ckevinbrands/" target="_blank">
+      <img src="images/logoinstagram.jpg" alt="Instagram" class="icono-redes">
+    </a>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBQmYwkqr29lvaF8ew3BJ2suc5UxRaVU1Y",
+    authDomain: "castingred-a6f6e.firebaseapp.com",
+    projectId: "castingred-a6f6e",
+    storageBucket: "castingred-a6f6e.appspot.com",
+    messagingSenderId: "61701399093",
+    appId: "1:61701399093:web:678b77ff06ce83e1a1077c",
+    measurementId: "G-J1QPG9HXGZ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+document.getElementById("formActor").addEventListener("submit", async function(e){
+  e.preventDefault();
+
+  const archivo = document.getElementById("fotoActor").files[0];
+  if(!archivo) return alert("Selecciona una foto");
+
+  const lector = new FileReader();
+  lector.onload = async function(event){
+    const actor = {
+      nombreCompleto: document.getElementById("nombreCompleto").value,
+      edad: document.getElementById("edad").value,
+      genero: document.getElementById("genero").value,
+      telefono: document.getElementById("telefono").value,
+      correo: document.getElementById("correo").value,
+      experiencia: document.getElementById("experiencia").value,
+      rolPreferido: document.getElementById("rolPreferido").value,
+      portafolioDigital: document.getElementById("portafolioDigital").value,
+      foto: event.target.result,
+      estado: "pendientes"
+    };
+
+    try {
+      await addDoc(collection(db, "actores"), actor);
+      alert("Registro exitoso!");
+      e.target.reset();
+    } catch (error) {
+      alert("Error al guardar actor: " + error.message);
+    }
+  };
+
+  lector.readAsDataURL(archivo);
+});
+</script>
+
+</body>
+</html>
